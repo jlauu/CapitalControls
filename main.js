@@ -3,10 +3,29 @@ var d3 = require("d3");
 var jsdom = require("jsdom");
 var port = 8080;
 var document = jsdom.jsdom();
-
+var pg = require('pg');
+var pgConString = "postgres://peter:peter@localhost:5432/capitalcontrols"
 var data = [{"country": "Angola", "equity": true, "bonds" : false, "credits" : false},
 	    {"country": "Bermuda", "equity": false, "bonds" : false, "credits": true},
 	    {"country": "China", "equity": true, "bonds" : true, "credits": true}]
+function getYear(y) {
+	return "SELECT country, year, (rtob(mm) OR rtob(bo)) as bonds, (rtob(ci) OR rtob(eq)) as equity, (rtob(fc) OR rtob(cc)) as credits FROM yearly WHERE year = " + y.toString() + ";";
+}
+pg.connect(pgConString, function(err, client, done) {
+	if (err) {
+		done();
+		return console.error('pg error');
+	}
+	client.query(getYear(2013), function(err, result) {
+		done();
+		if (err) {
+			console.log('failed query');
+			return data;
+		}
+		data = result.rows;
+		console.log(data);
+	});
+});
 
 var server = http.createServer(function (req, res) {
 	var width = 960,

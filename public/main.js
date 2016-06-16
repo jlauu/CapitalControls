@@ -1,6 +1,19 @@
 var categories = {bonds : 0, equity: 1, credits : 2};
 var svg, venn;
 
+function update(year) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            var data = JSON.parse(xhr.responseText);
+            populate(data);
+        }
+    }
+
+    xhr.open("GET", "http://localhost:8080/data?year=" + year.toString(), true);
+    xhr.send();
+}
+
 function init() {
     var width = 600,
         height = 600;
@@ -20,11 +33,12 @@ function init() {
            .style("fill", "none")
         i += 1;
     });
-    update(data);
+    update(2013);
 }
 
-function update(data) {
+function populate(data) {
     var dots = svg.selectAll(".dots").remove();
+    if (!data) return;
     data.forEach(function (row) {
         if (!(row.bonds || row.equity || row.credits)) return;
         var pt = randomPoint(makePlaceFunc(row, venn), makeInBounds(row, venn));

@@ -37,7 +37,7 @@ function init() {
 }
 
 function populate(data) {
-    var dots = svg.selectAll(".dots").remove();
+    var dots = svg.selectAll(".dot").remove();
     if (!data) return;
     data.forEach(function (row) {
         if (!(row.bonds || row.equity || row.credits)) return;

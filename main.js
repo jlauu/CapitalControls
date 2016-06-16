@@ -2,7 +2,6 @@ var express = require('express');
 var app = express();
 var url = require("url");
 var pg = require("pg"); 
-var pgclient = new Client(pgConString);
 var pgConString = "postgres://peter:peter@localhost:5432/capitalcontrols"
 var bodyParser = require("body-parser");
 
@@ -19,13 +18,20 @@ app.use(express.static(__dirname + '/public'));
 
 app.get('/data', function(request, response) {
     var year = url.parse(request.url, true).query.year;
-    pgclient.query(getYear(year), function(err, result) {
+    pg.connect(pgConString, function(err, client, done) {
         if (err) {
-            console.log("Failed query");
+            done();
+            return console.error('pg error');
         }
-        response.json(result.rows);
-    console.log(year);
-    response.json({year: 1995});
+        client.query(getYear(year), function(err, result) {
+            done();
+            if (err) {
+                console.log('failed query');
+                return data;
+            }
+            response.json(result.rows);
+        });
+    });
 });
 
 app.listen(8080, function () {

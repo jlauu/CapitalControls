@@ -1,0 +1,29 @@
+{
+  "name": "capitalcontrols",
+  "version": "1.0.0",
+  "description": "Venn diagram market basket analysis",
+  "main": "main.js",
+  "dependencies": {
+    "d3": "^3.5.17",
+    "express": "^4.14.0",
+    "jsdom": "^9.2.1",
+    "pg": "^5.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.cs.tufts.edu:plee03/capitalcontrols.git"
+  },
+  "keywords": [
+    "economics",
+    "data",
+    "visualization",
+    "d3",
+    "express"
+  ],
+  "author": "Peter Lee, Johnny Lau",
+  "license": "ISC"
+}

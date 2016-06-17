@@ -20,4 +20,3 @@ function VennDiagram (cx, cy, r, n) {
         this.circles.push(new Circle(ccx, ccy, r));
     }
 }
-

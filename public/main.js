@@ -1,6 +1,20 @@
 var categories = {bonds : 0, equity: 1, credits : 2};
 var svg, venn, data;
 
+// all combinations of asset categories
+var flags = (function () {
+    var flags = [];
+    for (var i = 0; i < 2; i++) {
+        for (var j = 0; j < 2; j++) {
+            for (var k = 0; k < 2; k++) {
+                if (i == 0 && j == 0 && k == 0) continue;
+                flags.push({bonds : i, equity : j, credits : k});
+            }
+         }
+    }
+    return flags;
+})();
+
 function update(year) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
@@ -16,47 +30,38 @@ function update(year) {
 
 function updateTextBox(x, y) { 
     d3.selectAll(".country-text").remove();
-    var flags; 
-    for (var i = 0; i < 2; i++) {
-        for (var j = 0; j < 2; j++) {
-            for (var k = 0; k < 2; k++) {
-                if (i == 0 && j == 0 && k == 0) continue;
-                flags = {bonds : i, equity : j, credits : k}
-                var inBounds = makeInBounds(flags, venn);
-                if (inBounds(x, y)) {
-                    var textbox = d3.select("#infobox")
-                    var countries = data.filter(function (row) {
-                        return flags.bonds == row.bonds &&
-                               flags.equity == row.equity &&
-                               flags.credits == row.credits;
-                    });
-                    var list = textbox.append("ul")
-                                .attr("class", "country-text")
-                                .attr("id", "countries");
-                    // Title
-                    var Assets = Object.keys(flags)
-                                    .filter(function (k) {return flags[k]});
-                    list.append("li")
-                        .text("Assets: " + Assets)
-                        .attr("class", "country-text");
-                    // Number of results
-                    list.append("li")
-                        .text(countries.length > 0 ?
-                              "Total: " + countries.length.toString() :
-                              "Total: None")
-                        .attr("class", "country-text");
-                    // Print each country
-                    countries.forEach(function(row) {
-                        list.append("li")
-                            .text(row.country + " ")
-                            .attr("class", "country-text");
-                    });
-                }
-            }
+    flags.forEach(function (flag) {
+        var inBounds = makeInBounds(flag, venn);
+        if (inBounds(x, y)) {
+            var textbox = d3.select("#infobox")
+            var countries = data.filter(function (row) {
+                return flags.bonds == row.bonds &&
+                       flags.equity == row.equity &&
+                       flags.credits == row.credits;
+            });
+            var list = textbox.append("ul")
+                        .attr("class", "country-text")
+                        .attr("id", "countries");
+            // Title
+            var Assets = Object.keys(flags)
+                            .filter(function (k) {return flags[k]});
+            list.append("li")
+                .text("Assets: " + Assets)
+                .attr("class", "country-text");
+            // Number of results
+            list.append("li")
+                .text(countries.length > 0 ?
+                      "Total: " + countries.length.toString() :
+                      "Total: None")
+                .attr("class", "country-text");
+            // Print each country
+            countries.forEach(function(row) {
+                list.append("li")
+                    .text(row.country + " ")
+                    .attr("class", "country-text");
+            });
         }
-    }
-
-                
+    });
 }
 
 

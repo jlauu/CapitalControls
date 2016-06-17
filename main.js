@@ -6,11 +6,13 @@ var pgConString = "postgres://peter:peter@localhost:5432/capitalcontrols"
 var bodyParser = require("body-parser");
 
 function getYear(y) {
-    return "SELECT country, year, " +
+    return "SELECT yearly.country, year, " +
             "(rtob(mm) OR rtob(bo)) as bonds, " +
                "(rtob(ci) OR rtob(eq)) as equity, " +
            "(rtob(fc) OR rtob(cc)) as credits " +
-           "FROM yearly WHERE year = " + y.toString() + ";";
+           "FROM yearly, clustering WHERE yearly.year = " + y.toString() + 
+           " AND yearly.country = clustering.country AND " + 
+           "clustering.kmeans = 'gate';";
 }
 
 app.use(express.static(__dirname + '/public'));
@@ -26,8 +28,8 @@ app.get('/data', function(request, response) {
         client.query(getYear(year), function(err, result) {
             done();
             if (err) {
-                console.log('failed query');
-                return data;
+                return console.error('failed query');
+                
             }
             response.json(result.rows);
         });

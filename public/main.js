@@ -115,18 +115,18 @@ function populate(data) {
                    row.credits == set.credits;
         });
         // Ring symbol
-        var n = fdata.length;
-        var apothem = .2 * venn.circles[0].r;
-        for (var i=0; i<n; i++) {
-            var dot_r = apothem * Math.tan(Math.PI / n);
-            svg.append("circle")
-               .attr("class", "dot")
-               .attr("cx", n==1 ? midpoint[0] : apothem*Math.cos(i*2*Math.PI/n) + midpoint[0])
-               .attr("cy", n==1 ? midpoint[1] : apothem*Math.sin(i*2*Math.PI/n) + midpoint[1])
-               .attr("r", n<3 ? n*.5 * apothem : dot_r/2)
-               .attr("stroke", "black")
-               .style("fill", getPointColor(set));
-        }
+//        var n = fdata.length;
+//        var apothem = .2 * venn.circles[0].r;
+//        for (var i=0; i<n; i++) {
+//            var dot_r = apothem * Math.tan(Math.PI / n);
+//            svg.append("circle")
+//               .attr("class", "dot")
+//               .attr("cx", n==1 ? midpoint[0] : apothem*Math.cos(i*2*Math.PI/n) + midpoint[0])
+//               .attr("cy", n==1 ? midpoint[1] : apothem*Math.sin(i*2*Math.PI/n) + midpoint[1])
+//               .attr("r", n<3 ? n*.5 * apothem : dot_r/2)
+//               .attr("stroke", "black")
+//               .style("fill", getPointColor(set));
+//        }
         // Number count
         svg.append("text")
            .attr("class", "dot")

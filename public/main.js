@@ -1,11 +1,11 @@
 var categories = {bonds : 0, equity: 1, credits : 2};
-var svg, venn;
+var svg, venn, data;
 
 function update(year) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
-            var data = JSON.parse(xhr.responseText);
+            data = JSON.parse(xhr.responseText);
             populate(data);
         }
     }
@@ -14,12 +14,45 @@ function update(year) {
     xhr.send();
 }
 
+function updateTextBox(x, y) { 
+    d3.selectAll(".country-text").remove();
+    var flags; 
+    for (var i = 0; i < 2; i++) {
+        for (var j = 0; j < 2; j++) {
+            for (var k = 0; k < 2; k++) {
+                if (i == 0 && j == 0 && k == 0) continue;
+                flags = {bonds : i, equity : j, credits : k}
+                var inBounds = makeInBounds(flags, venn);
+                if (inBounds(x, y)) {
+
+                    data.filter(function (row) {
+                        return flags.bonds == row.bonds &&
+                               flags.equity == row.equity &&
+                               flags.credits == row.credits;
+                    }).forEach(function(row) {
+                        d3.select("#countries").append("text")
+                            .text(row.country + " ")
+                            .attr("class", "country-text");
+                    });
+                }
+            }
+        }
+    }
+
+                
+}
+
+
 function init() {
     var width = 600,
         height = 600;
     svg = d3.select(".canvas").append("svg")
             .attr("width", width)
-            .attr("height", height);
+            .attr("height", height)
+            .on("mousemove", function() {
+                var m = d3.mouse(this);
+                updateTextBox(m[0], m[1]);
+            });
     venn = new VennDiagram (width/2, height/2, width/4, 3);
 
     var i = 0;

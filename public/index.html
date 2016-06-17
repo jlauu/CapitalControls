@@ -6,10 +6,26 @@
     <script type="text/javascript" src="main.js" ></script>
     <script type="text/javascript" src="d3.slider.js" ></script>
     <link rel="stylesheet" href="d3.slider.css"/>
+    <style>
+        .canvas {
+            width : 800;
+            margin : 0 auto;
+        }
+        
+        #slider {
+            width : 800;
+            margin : 0 auto;
+        }
+        #countries {
+
+        }
+        
+    </style>
 </head>
 <body onload="init()">
     <div class="canvas"></div>
     <div id="slider"></div>
+    <div id="countries"></div>
     <script>
         d3.select('#slider')
          .call(d3.slider()
@@ -19,7 +35,7 @@
                .step(1)
                .on("slide", function(evt, value) {
                     update(value);
-                   }));
+                   }));    
     </script>
 </body>
 </html>

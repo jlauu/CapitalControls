@@ -16,8 +16,18 @@
             width : 800;
             margin : 0 auto;
         }
+        #infobox {
+            position: fixed;
+            top: 10px;
+            right: 100px;
+            width: 300px;
+            height: 100px;
+        }
+        .country-text {
+            font-family: Arial, Helvetic, sans-serif;
+        }
         #countries {
-
+            list-style-type: none;
         }
         
     </style>
@@ -25,7 +35,7 @@
 <body onload="init()">
     <div class="canvas"></div>
     <div id="slider"></div>
-    <div id="countries"></div>
+    <div id="infobox"></div>
     <script>
         d3.select('#slider')
          .call(d3.slider()

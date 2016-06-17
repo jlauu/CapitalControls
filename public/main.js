@@ -24,13 +24,30 @@ function updateTextBox(x, y) {
                 flags = {bonds : i, equity : j, credits : k}
                 var inBounds = makeInBounds(flags, venn);
                 if (inBounds(x, y)) {
-
-                    data.filter(function (row) {
+                    var textbox = d3.select("#infobox")
+                    var countries = data.filter(function (row) {
                         return flags.bonds == row.bonds &&
                                flags.equity == row.equity &&
                                flags.credits == row.credits;
-                    }).forEach(function(row) {
-                        d3.select("#countries").append("text")
+                    });
+                    var list = textbox.append("ul")
+                                .attr("class", "country-text")
+                                .attr("id", "countries");
+                    // Title
+                    var Assets = Object.keys(flags)
+                                    .filter(function (k) {return flags[k]});
+                    list.append("li")
+                        .text("Assets: " + Assets)
+                        .attr("class", "country-text");
+                    // Number of results
+                    list.append("li")
+                        .text(countries.length > 0 ?
+                              "Total: " + countries.length.toString() :
+                              "Total: None")
+                        .attr("class", "country-text");
+                    // Print each country
+                    countries.forEach(function(row) {
+                        list.append("li")
                             .text(row.country + " ")
                             .attr("class", "country-text");
                     });

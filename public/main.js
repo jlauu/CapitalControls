@@ -1,5 +1,5 @@
 var categories = {bonds : 0, equity: 1, credits : 2};
-var svg, venn, data, year;
+var svg, venn, data, year, subsetshapes;
 
 // all combinations of asset categories
 var subsets = (function () {
@@ -80,12 +80,78 @@ function init() {
                 updateTextBox(m[0], m[1]);
             });
     venn = new VennDiagram (width/2, height/2, width/4, 3);
+    var i = 0;
+    subsets.forEach(function (set) {
+        var inclusive = Object.keys(set)
+                .filter(function (k) {return set[k];})
+                .map(function(k) {return venn.circles[categories[k]];});
+        var exclusive = Object.keys(set)
+                .filter(function (k) {return !set[k];})
+                .map(function(k) {return venn.circles[categories[k]];});
+
+        var path, start, end, b_sweep, intersections;
+        var r = venn.circles[0].r;
+        var theta = 0;
+        if (inclusive.length == 1) {
+            // outer, outer, inner
+            intersections = exclusive.map(function (c) {
+                return venn.getIntersection(c, inclusive[0]).outer;
+            });
+            intersections.push(venn.getIntersection(exclusive[0], exclusive[1]).inner);
+            // Outer arc
+            start = intersections[0];
+            end = intersections[1];
+            b_sweep = i == 1 ? 1 : 0; // HARDCODED
+            path = ["M",start[0],start[1],
+                    "A",r,r,theta,1,b_sweep,end[0],end[1]];
+            // Inner Arcs
+            end = intersections[2];
+            b_sweep = i == 1 ? 0 : 1; //HARDCODED
+            path = path.concat(["A",r,r,theta,0,b_sweep,end[0],end[1],
+                                "A",r,r,theta,0,b_sweep,start[0],start[1]]);
+        } else if (inclusive.length == 2) {
+            // inner, inner, outer
+            intersections = inclusive.map(function (c) {
+                return venn.getIntersection(c, exclusive[0]).inner;
+            });
+            intersections.push(venn.getIntersection(inclusive[0], inclusive[1]).outer);
+            // Small arc
+            start = intersections[0];
+            end = intersections[1];
+            b_sweep = i == 4 ? 1 : 0;
+            path = ["M",start[0],start[1],
+                    "A",r,r,theta,0,b_sweep,end[0],end[1]];
+            // Large arcs
+            end = intersections[2];
+            b_sweep = i == 4 ? 0 : 1;
+            path = path.concat(["A",r,r,theta,0,b_sweep,end[0],end[1],
+                                "A",r,r,theta,0,b_sweep,start[0],start[1]]);
+        } else {
+            intersections = [[0,1],[1,2],[0,2]].map(function (c) {
+                return venn.getIntersection(inclusive[c[0]], inclusive[c[1]]).inner;
+            });
+            start = intersections[0];
+            end = intersections[1];
+            path = ["M",start[0],start[1],
+                    "A",r,r,theta,0,1,end[0],end[1]];
+            end = intersections[2];
+            path = path.concat(["A",r,r,theta,0,1,end[0],end[1],
+                                "A",r,r,theta,0,1,start[0],start[1]]);
+        }
+        svg.append("path")
+           .attr("class", "venn-subset")
+           .attr("id", "p"+i)
+           .attr("d", path.join(" ") + " Z")
+           .attr("stroke", "none")
+           .attr("fill", "none");
+        i++;
+    });
 
     var i = 0;
     venn.circles.forEach(function (circle) {
         svg.append("circle")
            .attr("class", "venn-circle")
-           .attr("id", i)
+           .attr("id", "c"+i)
            .attr("cx", circle.cx)
            .attr("cy", circle.cy)
            .attr("r", circle.r)
@@ -99,7 +165,7 @@ function init() {
 function populate(data) {
     var dots = svg.selectAll(".dot").remove();
     if (!data) return;
-
+    var i = 0;
     subsets.forEach(function (set) {
         var circles = Object.keys(set)
                 .filter(function (k) {return set[k];})
@@ -114,6 +180,10 @@ function populate(data) {
                    row.bonds == set.bonds &&
                    row.credits == set.credits;
         });
+        d3.select("path#p"+i)
+          .style("fill", getPointColor(set))
+          .style("fill-opacity", fdata.length / data.length);
+
         // Ring symbol
 //        var n = fdata.length;
 //        var apothem = .2 * venn.circles[0].r;
@@ -134,6 +204,7 @@ function populate(data) {
            .attr("y", midpoint[1])
            .attr("text-anchor", "middle")
            .text(fdata.length.toString());
+           i++;
     });
     /* Randomly drawing individual dots
     data.forEach(function (row) {

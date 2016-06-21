@@ -4,16 +4,7 @@ var url = require("url");
 var pg = require("pg"); 
 var pgConString = process.env.DATABASE_URL || "postgres://peter:peter@localhost:5432/capitalcontrols";
 var bodyParser = require("body-parser");
-
-//function getQuery(y, c) {
-//    return "SELECT yearly.country, year, " +
-//            "(rtob(mm) OR rtob(bo)) as bonds, " +
-//               "(rtob(ci) OR rtob(eq)) as equity, " +
-//           "(rtob(fc) OR rtob(cc)) as credits " +
-//           "FROM yearly, clustering WHERE yearly.year = " + y.toString() + 
-//           " AND yearly.country = clustering.country AND " + 
-//           "clustering."+ c.toString() + " = 'gate';";
-//}
+var port = process.env.PORT || 8080;
 
 var baseMsg = "SELECT yearly.country, year, " +
               "(rtob(mm) OR rtob(bo)) as bonds, " +

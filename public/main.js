@@ -115,14 +115,15 @@ function init() {
     drawVennDiagram();
     d3.selectAll("#cluster-list li span").on("click", function () {
         update(this.innerHTML, {'year' : year, 'inc' : inc, 'peg' : peg});
-        d3.select("#selected").attr("id","");
-        this.id = "selected";
+        d3.select("#cluster-list .selected").attr("class","");
+        this.className = "selected";
     });
     d3.selectAll("#income-list li span").on("click", function () {
         inc = (this.innerHTML == "all") ? null : this.innerHTML;
         update(cluster, {'year' : year, 'inc' : inc, 'peg' : null});
-        d3.select("#selected").attr("id","");
-        this.id = "selected";
+        d3.select("#income-list .selected").attr("class","");
+        d3.select("#peg-list .selected").attr("class","");
+        this.className = "selected";
         title = inc ? inc : 'All';
     });
     d3.selectAll("#peg-list li span").on("click", function () {
@@ -134,8 +135,9 @@ function init() {
             peg = null;
         }
         update(cluster, {'year' : year, 'inc' : null, 'peg' : peg});
-        d3.select("#selected").attr("id","");
-        this.id = "selected";
+        d3.select("#peg-list .selected").attr("class","");
+        d3.select("#income-list .selected").attr("class","");
+        this.className = "selected";
         title = peg ? 'Peg' : 'Free Float';
     });
     title = 'low';

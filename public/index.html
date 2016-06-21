@@ -25,7 +25,7 @@
             height: 100px;
         }
         .country-text {
-            font-family: Arial, Helvetic, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
         #countries {
             list-style-type: none;
@@ -39,7 +39,7 @@
         }
         #cluster-list li{
             list-style-type: none;
-            font-family: Arial, Helvetic, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
         #income-list {
             position: fixed;
@@ -50,7 +50,7 @@
         }
         #income-list li{
             list-style-type: none;
-            font-family: Arial, Helvetic, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         #peg-list {
@@ -62,11 +62,10 @@
         }
         #peg-list li{
             list-style-type: none;
-            font-family: Arial, Helvetic, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
-        #selected {
-            font-weight: "bold";
-            background-color: "steelblue";   
+        .selected {
+            font-weight: bold;
         }
 
     </style>
@@ -77,7 +76,7 @@
     <div id="infobox"></div>
     <div id="cluster-list">
         <ul>
-            <li><span id="selected">kmeans</span></li>
+            <li><span class="selected">kmeans</span></li>
             <li><span>em</span></li>
             <li><span>hcadj</span></li>
             <li><span>hcaverage</span></li>
@@ -88,7 +87,7 @@
     </div> 
     <div id="income-list">
         <ul>
-            <li><span id="selected">high</span></li>
+            <li><span>high</span></li>
             <li><span>mid</span></li>
             <li><span>low</span></li>
             <li><span>all</span><li>
@@ -96,7 +95,7 @@
     </div>
     <div id="peg-list">
         <ul>
-            <li><span id="selected">peg</span></li>
+            <li><span>peg</span></li>
             <li><span>no peg</span></li>
             <li><span>reset peg</span></li>
         </ul>

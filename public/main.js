@@ -1,5 +1,5 @@
 var categories = {bonds : 0, equity: 1, credits : 2};
-var svg, venn, data, year, subsetshapes;
+var svg, venn, data, year, cluster, inc, peg;
 
 // all combinations of asset categories
 var subsets = (function () {
@@ -15,8 +15,11 @@ var subsets = (function () {
     return set;
 })();
 
-function update(y) {
-    year = y;
+function update(c, params) {
+    cluster = c;
+    year = params.year;
+    inc = params.inc;
+    peg = params.peg;
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
@@ -24,8 +27,16 @@ function update(y) {
             populate(data);
         }
     }
-
-    xhr.open("GET", "http://localhost:8080/data?year=" + year.toString(), true);
+    var msg = "http://localhost:8080/data?cluster="+ c.toString();
+    if (params.inc) {
+        msg += '&income=' + params.inc;
+    } else if (params.peg) {
+        msg += '&peg=' + params.peg;
+    
+    } else if (params.year) {
+        msg += '&year=' + year;
+    }
+    xhr.open("GET", msg, true);
     xhr.send();
 }
 
@@ -80,6 +91,34 @@ function init() {
                 updateTextBox(m[0], m[1]);
             });
     venn = new VennDiagram (width/2, height/2, width/4, 3);
+    drawVennDiagram();
+    d3.selectAll("#cluster-list li span").on("click", function () {
+        update(this.innerHTML, {'year' : year, 'inc' : inc, 'peg' : peg});
+        d3.select("#selected").attr("id","");
+        this.id = "selected";
+    });
+    d3.selectAll("#income-list li span").on("click", function () {
+        inc = (this.innerHTML == "all") ? null : this.innerHTML;
+        update(cluster, {'year' : year, 'inc' : inc, 'peg' : null});
+        d3.select("#selected").attr("id","");
+        this.id = "selected";
+    });
+    d3.selectAll("#peg-list li span").on("click", function () {
+        if (this.innerHTML == "peg") {
+            peg = "true";
+        } else if (this.innerHTML == "no peg") {
+            peg = "false";
+        } else {
+            peg = null;
+        }
+        update(cluster, {'year' : year, 'inc' : null, 'peg' : peg});
+        d3.select("#selected").attr("id","");
+        this.id = "selected";
+    });
+    update("kmeans", {year : '1995', inc : 'low'});
+}
+
+function drawVennDiagram() {
     var i = 0;
     subsets.forEach(function (set) {
         var inclusive = Object.keys(set)
@@ -159,7 +198,6 @@ function init() {
            .style("fill", "none")
         i += 1;
     });
-    update(1995);
 }
 
 function populate(data) {
@@ -181,7 +219,7 @@ function populate(data) {
                    row.credits == set.credits;
         });
         d3.select("path#p"+i)
-          .style("fill", getPointColor(set))
+          .style("fill", d3.hsl(20 + i * (360/subsets.length), 1, .5))
           .style("fill-opacity", fdata.length / data.length);
 
         // Ring symbol
@@ -228,7 +266,7 @@ function getOpacity(rows, cmp) {
 }
 
 function getPointColor(row) {
-    return d3.hsl(75 + 220 * ((row.bonds + row.equity + row.credits) / 3), .8, .5);
+    return d3.hsl(200+ 120 * ((row.bonds + row.equity + row.credits) / 3), 1, .5);
 }
 
 function makeInBounds(row, venn) {

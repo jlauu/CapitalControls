@@ -30,13 +30,77 @@
         #countries {
             list-style-type: none;
         }
-        
+        #cluster-list {
+            position: fixed;
+            top: 10px;
+            left: 100px;
+            width: 300px;
+            height: 100px;
+        }
+        #cluster-list li{
+            list-style-type: none;
+            font-family: Arial, Helvetic, sans-serif;
+        }
+        #income-list {
+            position: fixed;
+            top: 300px;
+            left: 100px;
+            width: 300px;
+            height: 100px;
+        }
+        #income-list li{
+            list-style-type: none;
+            font-family: Arial, Helvetic, sans-serif;
+        }
+
+        #peg-list {
+            position: fixed;
+            top: 500px;
+            left: 100px;
+            width: 300px;
+            height: 100px;
+        }
+        #peg-list li{
+            list-style-type: none;
+            font-family: Arial, Helvetic, sans-serif;
+        }
+        #selected {
+            font-weight: "bold";
+            background-color: "steelblue";   
+        }
+
     </style>
 </head>
 <body onload="init()">
     <div class="canvas"></div>
     <div id="slider"></div>
     <div id="infobox"></div>
+    <div id="cluster-list">
+        <ul>
+            <li><span id="selected">kmeans</span></li>
+            <li><span>em</span></li>
+            <li><span>hcadj</span></li>
+            <li><span>hcaverage</span></li>
+            <li><span>hccomplete</span></li>
+            <li><span>hcmean</span></li>
+            <li><span>hcward</span></li>
+        </ul>
+    </div> 
+    <div id="income-list">
+        <ul>
+            <li><span id="selected">high</span></li>
+            <li><span>mid</span></li>
+            <li><span>low</span></li>
+            <li><span>all</span><li>
+        </ul>
+    </div>
+    <div id="peg-list">
+        <ul>
+            <li><span id="selected">peg</span></li>
+            <li><span>no peg</span></li>
+            <li><span>reset peg</span></li>
+        </ul>
+    </div>
     <script>
         d3.select('#slider')
          .call(d3.slider()
@@ -46,7 +110,7 @@
                .step(1)
                .on("slide", function(evt, value) {
                     update(value);
-                   }));    
+                }));    
     </script>
 </body>
 </html>

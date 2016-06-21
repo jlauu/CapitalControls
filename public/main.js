@@ -27,7 +27,7 @@ function update(c, params) {
             populate(data);
         }
     }
-    var msg = "http://localhost:8080/data?cluster="+ c.toString();
+    var msg = "/data?cluster="+ c.toString();
     if (params.inc) {
         msg += '&income=' + params.inc;
     } else if (params.peg) {

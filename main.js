@@ -67,6 +67,6 @@ app.get('/data', function(request, response) {
     });
 });
 
-app.listen(8080, function () {
+app.listen(port, function () {
     console.log('Started');
 });

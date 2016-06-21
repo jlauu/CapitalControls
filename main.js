@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var url = require("url");
 var pg = require("pg"); 
-var pgConString = "postgres://peter:peter@localhost:5432/capitalcontrols"
+var pgConString = DATABASE_URL || "postgres://peter:peter@localhost:5432/capitalcontrols";
 var bodyParser = require("body-parser");
 
 //function getQuery(y, c) {

@@ -101,16 +101,5 @@
             <li><span>reset peg</span></li>
         </ul>
     </div>
-    <script>
-        d3.select('#slider')
-         .call(d3.slider()
-               .axis(true)
-               .min(1995)
-               .max(2013)
-               .step(1)
-               .on("slide", function(evt, value) {
-                    update(value);
-                }));    
-    </script>
 </body>
 </html>

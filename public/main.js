@@ -1,5 +1,5 @@
 var categories = {bonds : 0, equity: 1, credits : 2};
-var svg, venn, data, year, cluster, inc, peg;
+var svg, venn, data, year, cluster, inc, peg, title;
 
 // all combinations of asset categories
 var subsets = (function () {
@@ -33,8 +33,10 @@ function update(c, params) {
     } else if (params.peg) {
         msg += '&peg=' + params.peg;
     
-    } else if (params.year) {
-        msg += '&year=' + year;
+    } 
+    
+    if (params.year) {
+        msg += '&yearMin=' + year[0] + '&yearMax=' + year[1];
     }
     xhr.open("GET", msg, true);
     xhr.send();
@@ -56,7 +58,7 @@ function updateTextBox(x, y) {
                         .attr("id", "countries");
             // Title
             list.append("li")
-                .text("Year: " + year.toString())
+                .text(title + ' (' + cluster + ') ' + year[0] + '-' + year[1])
                 .attr("class", "country-text");
             var Assets = Object.keys(set)
                             .filter(function (k) {return set[k]});
@@ -70,11 +72,19 @@ function updateTextBox(x, y) {
                       "Total: None")
                 .attr("class", "country-text");
             // Print each country
+            var li = {};
             countries.forEach(function(row) {
-                list.append("li")
-                    .text(row.country + " ")
-                    .attr("class", "country-text");
+                if (li[row.country]) {
+                    li[row.country].push(row.year);
+                } else {
+                    li[row.country] = [row.year];
+                }
             });
+            for (var c in li) {
+                list.append('li')
+                    .text(c + ' (' + li[c].join(', ') + ') ')
+                    .attr('class', 'country-text')
+            }
         }
     });
 }
@@ -91,6 +101,17 @@ function init() {
                 updateTextBox(m[0], m[1]);
             });
     venn = new VennDiagram (width/2, height/2, width/4, 3);
+    d3.select('#slider')
+     .call(d3.slider()
+           .axis(true)
+           .min(1995)
+           .max(2013)
+           .step(1)
+           .value([1995,2013])
+           .on("slide", function(evt, value) {
+                year = value;
+                update(cluster, {'year':year,'inc':inc,'peg':peg});
+            }));    
     drawVennDiagram();
     d3.selectAll("#cluster-list li span").on("click", function () {
         update(this.innerHTML, {'year' : year, 'inc' : inc, 'peg' : peg});
@@ -102,6 +123,7 @@ function init() {
         update(cluster, {'year' : year, 'inc' : inc, 'peg' : null});
         d3.select("#selected").attr("id","");
         this.id = "selected";
+        title = inc ? inc : 'All';
     });
     d3.selectAll("#peg-list li span").on("click", function () {
         if (this.innerHTML == "peg") {
@@ -114,8 +136,10 @@ function init() {
         update(cluster, {'year' : year, 'inc' : null, 'peg' : peg});
         d3.select("#selected").attr("id","");
         this.id = "selected";
+        title = peg ? 'Peg' : 'Free Float';
     });
-    update("kmeans", {year : '1995', inc : 'low'});
+    title = 'low';
+    update("kmeans", {year : ['1993','2013']});
 }
 
 function drawVennDiagram() {
@@ -221,20 +245,6 @@ function populate(data) {
         d3.select("path#p"+i)
           .style("fill", d3.hsl(20 + i * (360/subsets.length), 1, .5))
           .style("fill-opacity", fdata.length / data.length);
-
-        // Ring symbol
-//        var n = fdata.length;
-//        var apothem = .2 * venn.circles[0].r;
-//        for (var i=0; i<n; i++) {
-//            var dot_r = apothem * Math.tan(Math.PI / n);
-//            svg.append("circle")
-//               .attr("class", "dot")
-//               .attr("cx", n==1 ? midpoint[0] : apothem*Math.cos(i*2*Math.PI/n) + midpoint[0])
-//               .attr("cy", n==1 ? midpoint[1] : apothem*Math.sin(i*2*Math.PI/n) + midpoint[1])
-//               .attr("r", n<3 ? n*.5 * apothem : dot_r/2)
-//               .attr("stroke", "black")
-//               .style("fill", getPointColor(set));
-//        }
         // Number count
         svg.append("text")
            .attr("class", "dot")
@@ -244,18 +254,6 @@ function populate(data) {
            .text(fdata.length.toString());
            i++;
     });
-    /* Randomly drawing individual dots
-    data.forEach(function (row) {
-        if (!(row.bonds || row.equity || row.credits)) return;
-        var pt = randomPoint(makePlaceFunc(row, venn), makeInBounds(row, venn));
-        svg.append("circle")
-           .attr("class", "dot")
-           .attr("cx", pt[0])
-           .attr("cy", pt[1])
-           .attr("r", 3)
-           .style("fill", getPointColor(row));
-    });
-    */
 }
 
 function getOpacity(rows, cmp) {

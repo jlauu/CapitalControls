@@ -113,12 +113,12 @@ function init() {
                 update(cluster, {'year':year,'inc':inc,'peg':peg});
             }));    
     drawVennDiagram();
-    d3.selectAll("#cluster-list li span").on("click", function () {
+    d3.selectAll("#cluster-list li span").on("click", function() {
         update(this.innerHTML, {'year' : year, 'inc' : inc, 'peg' : peg});
         d3.select("#cluster-list .selected").attr("class","");
         this.className = "selected";
     });
-    d3.selectAll("#income-list li span").on("click", function () {
+    d3.selectAll("#income-list li span").on("click", function() {
         inc = (this.innerHTML == "all") ? null : this.innerHTML;
         update(cluster, {'year' : year, 'inc' : inc, 'peg' : null});
         d3.select("#income-list .selected").attr("class","");
@@ -126,7 +126,7 @@ function init() {
         this.className = "selected";
         title = inc ? inc : 'All';
     });
-    d3.selectAll("#peg-list li span").on("click", function () {
+    d3.selectAll("#peg-list li span").on("click", function() {
         if (this.innerHTML == "peg") {
             peg = "true";
         } else if (this.innerHTML == "no peg") {
@@ -139,6 +139,12 @@ function init() {
         d3.select("#income-list .selected").attr("class","");
         this.className = "selected";
         title = peg ? 'Peg' : 'Free Float';
+    });
+    document.addEventListener('keydown', function(e) {
+        var key = e.key;
+        if (key != 'i') return;
+        var menus = d3.select("#interface");
+        menus.attr("class", menus.attr("class") != "hidden" ? "hidden" : "");
     });
     title = 'low';
     update("kmeans", {year : ['1993','2013']});

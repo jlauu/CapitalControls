@@ -8,6 +8,9 @@
     <script type="text/javascript" src="d3.slider.js" ></script>
     <link rel="stylesheet" href="d3.slider.css"/>
     <style>
+        body {
+            background: white;
+        }
         .canvas {
             width : 800;
             margin : 0 auto;
@@ -68,37 +71,43 @@
             font-weight: bold;
         }
 
+        .hidden {
+            display: none;
+        }
+
     </style>
 </head>
 <body onload="init()">
     <div class="canvas"></div>
-    <div id="slider"></div>
     <div id="infobox"></div>
-    <div id="cluster-list">
-        <ul>
-            <li><span class="selected">kmeans</span></li>
-            <li><span>em</span></li>
-            <li><span>hcadj</span></li>
-            <li><span>hcaverage</span></li>
-            <li><span>hccomplete</span></li>
-            <li><span>hcmean</span></li>
-            <li><span>hcward</span></li>
-        </ul>
-    </div> 
-    <div id="income-list">
-        <ul>
-            <li><span>high</span></li>
-            <li><span>mid</span></li>
-            <li><span>low</span></li>
-            <li><span>all</span><li>
-        </ul>
-    </div>
-    <div id="peg-list">
-        <ul>
-            <li><span>peg</span></li>
-            <li><span>no peg</span></li>
-            <li><span>reset peg</span></li>
-        </ul>
+    <div id="interface" >
+        <div id="slider"></div>
+        <div id="cluster-list">
+            <ul>
+                <li><span class="selected">kmeans</span></li>
+                <li><span>em</span></li>
+                <li><span>hcadj</span></li>
+                <li><span>hcaverage</span></li>
+                <li><span>hccomplete</span></li>
+                <li><span>hcmean</span></li>
+                <li><span>hcward</span></li>
+            </ul>
+        </div> 
+        <div id="income-list">
+            <ul>
+                <li><span>high</span></li>
+                <li><span>mid</span></li>
+                <li><span>low</span></li>
+                <li><span>all</span><li>
+            </ul>
+        </div>
+        <div id="peg-list">
+            <ul>
+                <li><span>peg</span></li>
+                <li><span>no peg</span></li>
+                <li><span>reset peg</span></li>
+            </ul>
+        </div>
     </div>
 </body>
 </html>

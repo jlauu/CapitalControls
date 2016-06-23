@@ -1,5 +1,5 @@
 var categories = {bonds : 0, equity: 1, credits : 2};
-var svg, venn, data, year, cluster, inc, peg, title;
+var svg, venn, data, year, cluster, inc, peg, title, ctryType;
 
 // all combinations of asset categories
 var subsets = (function () {
@@ -30,16 +30,61 @@ function update(c, params) {
     var msg = "/data?cluster="+ c.toString();
     if (params.inc) {
         msg += '&income=' + params.inc;
-    } else if (params.peg) {
+    }
+    if (params.peg) {
         msg += '&peg=' + params.peg;
-    
     } 
     
     if (params.year) {
         msg += '&yearMin=' + year[0] + '&yearMax=' + year[1];
     }
+    if (params.ctryType) {
+        msg += '&ctryType=' + ctryType;
+    }
     xhr.open("GET", msg, true);
     xhr.send();
+}
+
+function setTextBox(set) {
+    var textbox = d3.select("#infobox")
+    var countries = data.filter(function (row) {
+        return set.bonds == row.bonds &&
+               set.equity == row.equity &&
+               set.credits == row.credits;
+    });
+    var list = textbox.append("ul")
+                .attr("class", "country-text")
+                .attr("id", "countries");
+    // Title
+    list.append("li")
+        .text(title + ' (' + cluster + ') ' + year[0] + '-' + year[1])
+        .attr("class", "country-text");
+    var Assets = Object.keys(set)
+                    .filter(function (k) {return set[k]});
+    list.append("li")
+        .text("Assets: " + Assets)
+        .attr("class", "country-text");
+    // Number of results
+    list.append("li")
+        .text(countries.length > 0 ?
+              "Total: " + countries.length.toString() :
+              "Total: None")
+        .attr("class", "country-text");
+    // Print each country
+    var li = {};
+    countries.forEach(function(row) {
+        if (li[row.country]) {
+            li[row.country].push(row.year);
+        } else {
+            li[row.country] = [row.year];
+        }
+    });
+    for (var c in li) {
+        list.append('li')
+            .text(c + ' (' + li[c].join(', ') + ') ')
+            .attr('class', 'country-text')
+    }
+
 }
 
 function updateTextBox(x, y) { 
@@ -47,50 +92,17 @@ function updateTextBox(x, y) {
     subsets.forEach(function (set) {
         var inBounds = makeInBounds(set, venn);
         if (inBounds(x, y)) {
-            var textbox = d3.select("#infobox")
-            var countries = data.filter(function (row) {
-                return set.bonds == row.bonds &&
-                       set.equity == row.equity &&
-                       set.credits == row.credits;
-            });
-            var list = textbox.append("ul")
-                        .attr("class", "country-text")
-                        .attr("id", "countries");
-            // Title
-            list.append("li")
-                .text(title + ' (' + cluster + ') ' + year[0] + '-' + year[1])
-                .attr("class", "country-text");
-            var Assets = Object.keys(set)
-                            .filter(function (k) {return set[k]});
-            list.append("li")
-                .text("Assets: " + Assets)
-                .attr("class", "country-text");
-            // Number of results
-            list.append("li")
-                .text(countries.length > 0 ?
-                      "Total: " + countries.length.toString() :
-                      "Total: None")
-                .attr("class", "country-text");
-            // Print each country
-            var li = {};
-            countries.forEach(function(row) {
-                if (li[row.country]) {
-                    li[row.country].push(row.year);
-                } else {
-                    li[row.country] = [row.year];
-                }
-            });
-            for (var c in li) {
-                list.append('li')
-                    .text(c + ' (' + li[c].join(', ') + ') ')
-                    .attr('class', 'country-text')
-            }
+            setTextBox(set);
         }
     });
+    if (x >= 530 && x <= 580 && y >= 200 && y <= 215) {
+        setTextBox({bonds : false, equity : false, credits : false});
+    }
 }
 
 
 function init() {
+    ctryType = 'gate';
     var width = 600,
         height = 600;
     svg = d3.select(".canvas").append("svg")
@@ -110,19 +122,21 @@ function init() {
            .value([1995,2013])
            .on("slide", function(evt, value) {
                 year = value;
-                update(cluster, {'year':year,'inc':inc,'peg':peg});
+                update(cluster, {'year' : year, 'inc' : inc, 
+                                 'peg' : peg, 'ctryType' : ctryType});
             }));    
     drawVennDiagram();
     d3.selectAll("#cluster-list li span").on("click", function() {
-        update(this.innerHTML, {'year' : year, 'inc' : inc, 'peg' : peg});
+        update(this.innerHTML, {'year' : year, 'inc' : inc, 
+                                'peg' : peg, 'ctryType' : ctryType});
         d3.select("#cluster-list .selected").attr("class","");
         this.className = "selected";
     });
     d3.selectAll("#income-list li span").on("click", function() {
         inc = (this.innerHTML == "all") ? null : this.innerHTML;
-        update(cluster, {'year' : year, 'inc' : inc, 'peg' : null});
+        update(cluster, {'year' : year, 'inc' : inc, 
+                         'peg' : peg, 'ctryType' : ctryType});
         d3.select("#income-list .selected").attr("class","");
-        d3.select("#peg-list .selected").attr("class","");
         this.className = "selected";
         title = inc ? inc : 'All';
     });
@@ -134,11 +148,18 @@ function init() {
         } else {
             peg = null;
         }
-        update(cluster, {'year' : year, 'inc' : null, 'peg' : peg});
+        update(cluster, {'year' : year, 'inc' : inc, 
+                         'peg' : peg, 'ctryType' : ctryType});
         d3.select("#peg-list .selected").attr("class","");
-        d3.select("#income-list .selected").attr("class","");
         this.className = "selected";
         title = peg ? 'Peg' : 'Free Float';
+    });
+    d3.selectAll("#type-list li span").on("click", function() {
+        ctryType = (this.innerHTML == "all") ? null : this.innerHTML;
+        update(cluster, {'year' : year, 'inc' : inc, 
+                         'peg' : peg, 'ctryType' : ctryType});
+        d3.select("#type-list .selected").attr("class","");
+        this.className = "selected";
     });
     document.addEventListener('keydown', function(e) {
         var key = e.key;
@@ -147,7 +168,7 @@ function init() {
         menus.attr("class", menus.attr("class") != "hidden" ? "hidden" : "");
     });
     title = 'low';
-    update("kmeans", {year : ['1993','2013']});
+    update("kmeans", {year : ['1993','2013'], ctryType : 'gate'});
 }
 
 function drawVennDiagram() {
@@ -260,8 +281,21 @@ function populate(data) {
            .attr("y", midpoint[1])
            .attr("text-anchor", "middle")
            .text(fdata.length.toString());
-           i++;
+        i++;
     });
+
+    // Excluded set
+    var excluded = data.filter(function (row) {
+        return !(row.equity || row.bonds || row.credits);
+    }).length;
+    svg.append("text")
+        .attr("class", "dot")
+        .attr("x", "550")
+        .attr("y", "210")
+        .attr("id", "excluded")
+        .attr("text-anchor", "middle")
+        .text(excluded.toString())
+
 }
 
 function getOpacity(rows, cmp) {

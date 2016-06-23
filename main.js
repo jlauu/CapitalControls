@@ -11,24 +11,31 @@ var baseMsg = "SELECT yearly.country, year, " +
               "(rtob(ci) OR rtob(eq)) as equity, " +
               "(rtob(fc) OR rtob(cc)) as credits " +
               "FROM yearly, clustering WHERE" + 
-              " yearly.country = clustering.country AND ";
+              " yearly.country = clustering.country";
 
 var income = {'high' : 'yearly.hgh', 
               'mid' : 'yearly.umd',
               'low' : '(yearly.lmd OR yearly.low)'};
 
-function getAll(c) {
-    return baseMsg + "clustering."+ c.toString() + " = 'gate'";
+function getQuery(q) {
+        var query = baseMsg;
+        if (q.cluster && q.ctryType) {
+            query += " AND clustering."+ q.cluster.toString() + " = '" +
+                     q.ctryType.toString() + "'";
+        }
+        if (q.income) {
+            query += " AND " + income[q.income];
+        }
+        if (q.peg != null) {
+            query += " AND yearly.peg = " + q.peg.toString();
+        } 
+        if (q.yearMin && q.yearMax) {
+            query += ' AND yearly.year >= ' + q.yearMin.toString() + ' AND ' +
+                     'yearly.year <= ' + q.yearMax.toString();
+        }
+        return query + ";";
 }
 
-function getByIncome(c, inc) {
-    return baseMsg + "clustering."+ c.toString() + " = 'gate' " +
-           "AND " + income[inc];
-}
-function getByPeg(c, peg) {
-    return baseMsg + "clustering."+ c.toString() + " = 'gate' " +
-           "AND yearly.peg = " + peg.toString();
-}
 app.use(express.static(__dirname + '/public'));
 
 app.get('/data', function(request, response) {
@@ -37,25 +44,13 @@ app.get('/data', function(request, response) {
     var yearMax = url.parse(request.url, true).query.yearMax;
     var income = url.parse(request.url, true).query.income;
     var peg = url.parse(request.url, true).query.peg;
+    var ctryType = url.parse(request.url, true).query.ctryType;
     pg.connect(pgConString, function(err, client, done) {
-        var query;
+        var query = getQuery(url.parse(request.url, true).query);
         if (err) {
             done();
             return console.error('pg error');
-        } else if (income) {
-            query = getByIncome(cluster, income);
-        } else if (peg) {
-            query = getByPeg(cluster, peg);
-        } else {
-            query = getAll(cluster);
         }
-
-        if (yearMin && yearMax) {
-            query += ' AND yearly.year >= ' + yearMin.toString() + ' AND ' +
-                     'yearly.year <= ' + yearMax.toString();
-        }
-
-        query += ';';
         client.query(query, function(err, result) {
             done();
             if (err) {

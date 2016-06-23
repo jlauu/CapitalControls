@@ -40,32 +40,24 @@
             width: 300px;
             height: 100px;
         }
-        #cluster-list li{
+        li {
             list-style-type: none;
             font-family: Arial, Helvetica, sans-serif;
         }
         #income-list {
             position: fixed;
-            top: 300px;
+            top: 200px;
             left: 100px;
             width: 300px;
             height: 100px;
-        }
-        #income-list li{
-            list-style-type: none;
-            font-family: Arial, Helvetica, sans-serif;
         }
 
         #peg-list {
             position: fixed;
-            top: 500px;
+            top: 350px;
             left: 100px;
             width: 300px;
             height: 100px;
-        }
-        #peg-list li{
-            list-style-type: none;
-            font-family: Arial, Helvetica, sans-serif;
         }
         .selected {
             font-weight: bold;
@@ -73,6 +65,14 @@
 
         .hidden {
             display: none;
+        }
+        #type-list {
+            position: fixed;
+            top: 450px;
+            left: 100px;
+            width: 300px;
+            height: 100px;
+            
         }
 
     </style>
@@ -98,16 +98,29 @@
                 <li><span>high</span></li>
                 <li><span>mid</span></li>
                 <li><span>low</span></li>
-                <li><span>all</span><li>
+                <li><span class="selected">all</span><li>
             </ul>
         </div>
         <div id="peg-list">
             <ul>
                 <li><span>peg</span></li>
                 <li><span>no peg</span></li>
-                <li><span>reset peg</span></li>
+                <li><span class="selected">all</span></li>
             </ul>
         </div>
+        <div id="type-list">
+            <ul>
+                <li><span>wall</span></li>
+                <li><span class="selected">gate</span></li>
+                <li><span>open</span></li>
+                <li><span>all</span></li>
+            </ul>
+        </div>
+        <div id="excluded-list" class="hidden">
+            <ul>
+                <li><span>show excluded</span></li>
+            </ul>
+        </ul>
     </div>
 </body>
 </html>
